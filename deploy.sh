@@ -10,6 +10,6 @@ source /home/websurfinmurf/projects/secrets/postgres.env
 set +a
 
 echo "Starting PostgreSQL container..."
-docker compose up -d
+docker-compose up -d
 
 echo "Deployment complete."
