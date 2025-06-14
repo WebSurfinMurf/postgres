@@ -10,5 +10,5 @@ docker run -d \
   --name "$PGADMIN_CONTAINER_NAME" \
   -e PGADMIN_DEFAULT_EMAIL="$PGADMIN_EMAIL" \
   -e PGADMIN_DEFAULT_PASSWORD="$PGADMIN_PASSWORD" \
-  -p 80:8901 \
+  -p 8091:80 \
   dpage/pgadmin4
