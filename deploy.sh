@@ -15,6 +15,7 @@ docker volume create $POSTGRES_VOLUME >/dev/null
 echo "Starting PostgreSQL container..."
 docker run -d \
   --name "$POSTGRES_CONTAINER_NAME" \
+  --label hidden=true \
   -e POSTGRES_USER="$POSTGRES_USER" \
   -e POSTGRES_PASSWORD="$POSTGRES_PASSWORD" \
   -e POSTGRES_DB="$POSTGRES_DB" \
