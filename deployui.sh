@@ -10,5 +10,6 @@ docker run -d \
   --name "$PGADMIN_CONTAINER_NAME" \
   -e PGADMIN_DEFAULT_EMAIL="$PGADMIN_EMAIL" \
   -e PGADMIN_DEFAULT_PASSWORD="$PGADMIN_PASSWORD" \
+  -v /home/websurfinmurf/projects/secrets/postgresservers.json:/pgadmin4/servers.json
   -p 8901:80 \
   dpage/pgadmin4
