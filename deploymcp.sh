@@ -11,6 +11,7 @@ echo "Stopping and removing any existing MCP server container..."
 docker rm -f "${MCP_SERVER_NAME}" 2>/dev/null || true
 
 echo "Starting MCP server container..."
+echo "docker run -d --name ${MCP_SERVER_NAME} -p ${EPORT}:${IPORT} ${MCP_IMAGE} ${DATABASE_URI} --access-mode=unrestricted"
 docker run -d \
   --name "${MCP_SERVER_NAME}" \
   -p "${EPORT}:${IPORT}" \
