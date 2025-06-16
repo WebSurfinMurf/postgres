@@ -7,6 +7,9 @@ source /home/websurfinmurf/projects/secrets/postgres.env
 source /home/websurfinmurf/projects/secrets/postgres-mcp.env
 set +a
 
+echo "Stopping and removing any existing MCP server container..."
+docker rm -f "${MCP_SERVER_NAME}" 2>/dev/null || true
+
 echo "Starting MCP server container..."
 docker run -d \
   --name "${MCP_SERVER_NAME}" \
