@@ -1,25 +1,28 @@
 #!/bin/bash
 set -e
 
-echo "Loading environment variables..."
+echo " Loading environment variables..."
 set -a
 source /home/websurfinmurf/projects/secrets/postgres.env
 source /home/websurfinmurf/projects/secrets/postgres-mcp.env
 set +a
 
-echo "Stopping existing container if running..."
+echo " Stopping and removing any existing MCP server container..."
 docker rm -f "${MCP_SERVER_NAME}" 2>/dev/null || true
 
-echo "Starting MCP container with SSE enabled..."
+echo " Starting MCP server container..."
 docker run -d \
   --name "${MCP_SERVER_NAME}" \
   -p "${EPORT}:${IPORT}" \
   "${MCP_IMAGE}" \
-  --transport=sse \
+  "${DATABASE_URI}" \
   --access-mode=unrestricted \
+  --transport=sse \
   --sse-host=0.0.0.0 \
-  --sse-port="${IPORT}" \
-  "${DATABASE_URI}"
+  --sse-port="${IPORT}"
 
-echo "✅ MCP server '${MCP_SERVER_NAME}' running:"
-echo "   ➤ Access via: http://localhost:${EPORT}/sse"
+echo "✅ MCP Server is running:"
+echo "    URI: ${DATABASE_URI}"
+echo "    Internal Port: ${IPORT}"
+echo "    External Port: ${EPORT}"
+echo "    Container Name: ${MCP_SERVER_NAME}"
