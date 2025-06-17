@@ -23,7 +23,6 @@ echo "Starting MCP server container..."
 echo "docker run --rm -it --name ${MCP_SERVER_NAME}   --add-host=host.docker.internal:${HOST_IP} -p ${EPORT}:${IPORT} ${MCP_IMAGE} ${DATABASE_URI} --access-mode=unrestricted"
 docker run -d \
   --name "${MCP_SERVER_NAME}" \
-  --add-host=host.docker.internal:"${HOST_IP}" \
   -p "${EPORT}:${IPORT}" \
   "${MCP_IMAGE}" \
   "${DATABASE_URI}" \
