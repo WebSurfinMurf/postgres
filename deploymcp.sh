@@ -17,8 +17,8 @@ docker run -d \
   --name "${MCP_SERVER_NAME}" \
   -p "${EPORT}:${IPORT}" \
   "${MCP_IMAGE}" \
-  --uri "${DATABASE_URI}" \
-  --unrestricted
+  --access-mode unrestricted \
+  "${DATABASE_URI}"
 
 echo "✅ MCP Server '${MCP_SERVER_NAME}' running"
 echo "🌐 Accessible at http://localhost:${EPORT}"
