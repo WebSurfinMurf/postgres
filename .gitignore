@@ -1,0 +1,66 @@
+# Environment and secrets
+*.env
+.env.*
+*.secret
+secrets/
+credentials/
+
+# Certificates and keys
+*.key
+*.pem
+*.crt
+*.cert
+*.p12
+*.pfx
+ssl/
+certs/
+certificates/
+
+# PostgreSQL specific
+pgdata/
+postgres-data/
+*.pgdump
+*.dump
+*.sql
+pg_backup/
+backups/
+
+# Database files
+*.db
+*.sqlite
+
+# Logs
+*.log
+logs/
+*.out
+*.err
+
+# Backups and temp files
+*.bak
+*.backup
+*.tmp
+*.temp
+*.old
+*.orig
+*.swp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+.Trash-*
+
+# Docker volumes
+volumes/
+data/
+*.pid
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-*
+
+# Runtime and cache
+__pycache__/
+*.pyc
+.cache/
