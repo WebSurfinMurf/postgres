@@ -59,20 +59,20 @@ _This section is updated by Claude during each session_
 ## Credentials
 ### Main PostgreSQL
 - **Admin User**: admin
-- **Admin Password**: Pass123qp
+- **Admin Password**: <see secrets/postgres.env>
 - **Default Database**: defaultdb
 - **Port**: 5432
 
 ### pgAdmin
-- **Email**: websurfinmurf@gmail.com
-- **Password**: Pass123qp
+- **Email**: <see secrets/postgres.env>
+- **Password**: <see secrets/postgres.env>
 - **URL**: http://linuxserver.lan:8901
 
 ### Keycloak Database (managed separately)
 - **Container**: keycloak-postgres
 - **Database**: keycloak
 - **User**: keycloak
-- **Password**: SecureDbPass2024!
+- **Password**: <see secrets/keycloak.env>
 
 ## Database Management
 ### Current Databases
@@ -86,13 +86,13 @@ Add these servers in pgAdmin:
    - Host: postgres
    - Port: 5432
    - Username: admin
-   - Password: Pass123qp
+   - Password: <see secrets/postgres.env>
 
 2. **Keycloak PostgreSQL**
    - Host: keycloak-postgres
    - Port: 5432
    - Username: keycloak
-   - Password: SecureDbPass2024!
+   - Password: <see secrets/keycloak.env>
 
 ## Known Issues & TODOs
 - [ ] Implement automated backup schedule
@@ -120,7 +120,7 @@ docker logs postgres --tail 50
 
 # Connect via psql
 psql -h localhost -p 5432 -U admin -d defaultdb
-# Password: Pass123qp
+# Password: <see secrets/postgres.env>
 
 # List all databases
 psql -h localhost -p 5432 -U admin -d postgres -c "\l"
