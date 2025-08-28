@@ -12,6 +12,22 @@ PostgreSQL is the primary database server for the infrastructure, providing:
 ## Recent Work & Changes
 _This section is updated by Claude during each session_
 
+### Session: 2025-08-28
+- **Documentation Update**: Verified and documented current state
+  - pgAdmin running with native OAuth2/Keycloak SSO
+  - Auto-provisioning working for administrators group
+  - External access confirmed at https://pgadmin.ai-servicers.com
+  - All deployment scripts tested and functional
+
+### Session: 2025-08-27
+- **pgAdmin Keycloak SSO Integration**: Successfully implemented native OAuth2
+  - Single sign-on with auto-provisioning
+  - Group-based role mapping (administrators → full access)
+  - Configuration in `pgadmin-oauth2-config.py`
+  - Deployment script: `deploy-pgadmin-sso.sh`
+  - Accessible at https://pgadmin.ai-servicers.com
+- **Cleanup**: Archived obsolete deployment scripts to `archived/` directory
+
 ### Session: 2025-08-22
 - **MIGRATION COMPLETE**: Moved from websurfinmurf to administrator ownership
 - Deployed pgAdmin for web-based database management
@@ -40,17 +56,20 @@ _This section is updated by Claude during each session_
 - **Container**: pgadmin
 - **Image**: dpage/pgadmin4
 - **Port**: 8901 (web interface)
-- **Network**: postgres-net only
-- **Access**: http://linuxserver.lan:8901
+- **Networks**: postgres-net, traefik-proxy
+- **External Access**: https://pgadmin.ai-servicers.com (with Keycloak SSO)
+- **Local Access**: http://linuxserver.lan:8901
+- **Authentication**: OAuth2/Keycloak with auto-provisioning
 
 ## Important Files & Paths
 - **Deploy Scripts**: 
-  - `/home/administrator/projects/postgres/deploy.sh` (PostgreSQL)
-  - `/home/administrator/projects/postgres/deployui.sh` (pgAdmin)
+  - `/home/administrator/projects/postgres/deploy.sh` (PostgreSQL database server)
+  - `/home/administrator/projects/postgres/deploy-pgadmin-sso.sh` (pgAdmin with Keycloak SSO)
 - **Secrets**: `/home/administrator/projects/secrets/postgres.env`
 - **pgAdmin Config**: 
-  - `/home/administrator/projects/secrets/postgresservers.json`
-  - `/home/administrator/projects/secrets/.pgpass`
+  - `/home/administrator/projects/postgres/pgadmin-oauth2-config.py` (OAuth2 and auto-provisioning)
+  - `/home/administrator/projects/secrets/postgresservers.json` (Server connections)
+  - `/home/administrator/projects/secrets/.pgpass` (Database passwords)
 - **Backup Scripts**:
   - `backupdb.sh` - Full database backup
   - `backupdbsql.sh` - SQL format backup
@@ -64,9 +83,10 @@ _This section is updated by Claude during each session_
 - **Port**: 5432
 
 ### pgAdmin
-- **Email**: <see secrets/postgres.env>
-- **Password**: <see secrets/postgres.env>
-- **URL**: http://linuxserver.lan:8901
+- **SSO Access**: Click "Sign in with Keycloak SSO" at https://pgadmin.ai-servicers.com
+- **Fallback Email**: <see secrets/postgres.env>
+- **Fallback Password**: <see secrets/postgres.env>
+- **Local URL**: http://linuxserver.lan:8901
 
 ### Keycloak Database (managed separately)
 - **Container**: keycloak-postgres
@@ -94,11 +114,42 @@ Add these servers in pgAdmin:
    - Username: keycloak
    - Password: <see secrets/keycloak.env>
 
+## Keycloak OAuth2 Configuration
+- **Client ID**: pgadmin
+- **Client Secret**: Stored in secrets/postgres.env
+- **Redirect URI**: https://pgadmin.ai-servicers.com/oauth2/callback
+- **Provider**: keycloak-oidc
+- **Group Restriction**: /administrators (full group path required)
+
+### OAuth2 Proxy Network Configuration
+Due to Docker container network isolation and router NAT reflection:
+- **Login URL**: Uses external https://keycloak.ai-servicers.com (user-facing)
+- **Token URL**: Uses internal http://keycloak:8080 (backend operations)
+- **JWKS URL**: Uses internal http://keycloak:8080 (certificate verification)
+- **Skip OIDC Discovery**: Required due to issuer URL mismatch
+
+## Troubleshooting OAuth2 Issues
+### "Forbidden" After Login
+- **Cause**: User not in administrators group or group path incorrect
+- **Solution**: Use full group path `/administrators` not just `administrators`
+
+### Issuer Verification Error
+- **Error**: "issuer did not match the issuer returned by provider"
+- **Cause**: Keycloak reports external URL but proxy connects internally
+- **Solution**: Set `OAUTH2_PROXY_SKIP_OIDC_DISCOVERY=true`
+
+### Container Can't Reach Keycloak
+- **Error**: "dial tcp 192.168.1.13:443: i/o timeout"
+- **Cause**: Router NAT reflection prevents containers reaching external IP
+- **Solution**: Use internal URLs for backend operations
+
 ## Known Issues & TODOs
 - [ ] Implement automated backup schedule
 - [ ] Create developer database management scripts
 - [ ] Set up database creation self-service for developers
 - [ ] Configure backup retention policies
+- [x] pgAdmin external access with Keycloak SSO (completed 2025-08-27)
+- [x] Auto-provisioning from Keycloak groups (completed 2025-08-27)
 
 ## Important Notes
 - **Owner**: administrator (UID 2000)
@@ -112,8 +163,8 @@ Add these servers in pgAdmin:
 cd /home/administrator/projects/postgres
 ./deploy.sh
 
-# Deploy pgAdmin
-./deployui.sh
+# Deploy pgAdmin with SSO
+./deploy-pgadmin-sso.sh
 
 # Check PostgreSQL logs
 docker logs postgres --tail 50
@@ -158,4 +209,4 @@ docker inspect postgres --format '{{range $net, $conf := .NetworkSettings.Networ
 - **Location**: Defined by POSTGRES_BACKUP_DIR in postgres.env
 
 ---
-*Last Updated: 2025-08-22 by Claude*
+*Last Updated: 2025-08-28 by Claude*
