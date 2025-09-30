@@ -25,7 +25,7 @@ docker run -d \
   -v /home/administrator/projects/postgres/pgadmin-oauth2-config.py:/pgadmin4/config_local.py:ro \
   -p 8901:80 \
   --label "traefik.enable=true" \
-  --label "traefik.docker.network=traefik-proxy" \
+  --label "traefik.docker.network=traefik-net" \
   --label "traefik.http.routers.pgadmin.rule=Host(\`pgadmin.ai-servicers.com\`)" \
   --label "traefik.http.routers.pgadmin.entrypoints=websecure" \
   --label "traefik.http.routers.pgadmin.tls=true" \
@@ -33,9 +33,9 @@ docker run -d \
   --label "traefik.http.services.pgadmin.loadbalancer.server.port=80" \
   dpage/pgadmin4
 
-# Connect pgAdmin to traefik-proxy network for external access
-echo "Connecting pgAdmin to traefik-proxy network..."
-docker network connect traefik-proxy "$PGADMIN_CONTAINER_NAME"
+# Connect pgAdmin to traefik-net network for external access
+echo "Connecting pgAdmin to traefik-net network..."
+docker network connect traefik-net "$PGADMIN_CONTAINER_NAME"
 
 echo "✅ pgAdmin with native OAuth2 SSO deployed successfully!"
 echo ""
