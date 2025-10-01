@@ -1,0 +1,44 @@
+version: '3.8'
+
+networks:
+  postgres-net:
+    external: true
+  traefik-net:
+    external: true
+
+volumes:
+  pgadmin-data:
+    external: true
+    name: pgadmin_data
+
+services:
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ${PGADMIN_CONTAINER_NAME:-pgadmin}
+    restart: unless-stopped
+    networks:
+      - postgres-net
+      - traefik-net
+    ports:
+      - "${PGADMIN_PORT:-8901}:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_DISABLE_POSTFIX: "true"
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
+      PGADMIN_OAUTH2_CLIENT_ID: ${PGADMIN_OAUTH2_CLIENT_ID}
+      PGADMIN_OAUTH2_CLIENT_SECRET: ${PGADMIN_OAUTH2_CLIENT_SECRET}
+      PGPASSFILE: /home/pgadmin/.pgpass
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+      - /home/administrator/secrets/postgresservers.json:/pgadmin4/servers.json:ro
+      - /home/administrator/secrets/.pgpass:/home/pgadmin/.pgpass:ro
+      - /home/administrator/projects/postgres/pgadmin-oauth2-config.py:/pgadmin4/config_local.py:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-net"
+      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.ai-servicers.com`)"
+      - "traefik.http.routers.pgadmin.entrypoints=websecure"
+      - "traefik.http.routers.pgadmin.tls=true"
+      - "traefik.http.routers.pgadmin.tls.certresolver=letsencrypt"
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=80"

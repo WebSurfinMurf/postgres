@@ -1,18 +1,33 @@
-version: "3.8"
+version: '3.8'
+
+networks:
+  postgres-net:
+    external: true
+
+volumes:
+  postgres-data:
+    external: true
+    name: postgres_data
 
 services:
   postgres:
-    image: postgres:15
-    container_name: postgres
+    image: ${POSTGRES_IMAGE:-postgres:15}
+    container_name: ${POSTGRES_CONTAINER_NAME:-postgres}
     restart: unless-stopped
+    networks:
+      - postgres-net
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_DB: ${POSTGRES_DB:-defaultdb}
     volumes:
-      - pgdata:/var/lib/postgresql/data
-
-volumes:
-  pgdata:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB:-defaultdb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "hidden=true"
