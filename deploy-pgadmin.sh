@@ -10,7 +10,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 # Environment file
-ENV_FILE="/home/administrator/secrets/postgres.env"
+ENV_FILE="$HOME/projects/secrets/postgres.env"
 
 # Color codes
 RED='\033[0;31m'
@@ -55,12 +55,12 @@ done
 echo -e "${GREEN}✅ All required networks exist${NC}"
 
 # Check required files
-if [ ! -f "/home/administrator/secrets/postgresservers.json" ]; then
+if [ ! -f "$HOME/projects/secrets/postgresservers.json" ]; then
     echo -e "${RED}❌ postgresservers.json not found${NC}"
     exit 1
 fi
 
-if [ ! -f "/home/administrator/secrets/.pgpass" ]; then
+if [ ! -f "$HOME/projects/secrets/.pgpass" ]; then
     echo -e "${RED}❌ .pgpass not found${NC}"
     exit 1
 fi

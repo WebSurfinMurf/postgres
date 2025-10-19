@@ -6,7 +6,7 @@ echo "==================================================="
 
 # Load environment
 set -a
-source /home/administrator/secrets/postgres.env
+source $HOME/projects/secrets/postgres.env
 set +a
 
 # Remove existing containers
@@ -26,8 +26,8 @@ docker run -d \
   -e PGADMIN_DEFAULT_PASSWORD="$PGADMIN_PASSWORD" \
   -e PGADMIN_DISABLE_POSTFIX="true" \
   -e PGPASSFILE=/home/pgadmin/.pgpass \
-  -v /home/administrator/secrets/postgresservers.json:/pgadmin4/servers.json \
-  -v /home/administrator/secrets/.pgpass:/home/pgadmin/.pgpass:ro \
+  -v $HOME/projects/secrets/postgresservers.json:/pgadmin4/servers.json \
+  -v $HOME/projects/secrets/.pgpass:/home/pgadmin/.pgpass:ro \
   -v pgadmin_data:/var/lib/pgadmin \
   dpage/pgadmin4
 
@@ -40,7 +40,7 @@ docker run -d \
   --name pgadmin-auth-proxy \
   --restart unless-stopped \
   --network keycloak-net \
-  --env-file /home/administrator/secrets/pgadmin-oauth2.env \
+  --env-file $HOME/projects/secrets/pgadmin-oauth2.env \
   --label "traefik.enable=true" \
   --label "traefik.docker.network=traefik-net" \
   --label "traefik.http.routers.pgadmin.rule=Host(\`pgadmin.ai-servicers.com\`)" \

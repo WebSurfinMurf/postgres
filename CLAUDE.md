@@ -70,7 +70,7 @@ _This section is updated by Claude during each session_
   - Nextcloud, OpenProject, Guacamole (application databases)
   - MCP servers (database operations)
   - Postfix/Mail services
-- **Isolation**: Not accessible via traefik-proxy for security
+- **Isolation**: Not accessible via traefik-net for security
 - **Port**: 5432 exposed on host for direct database access
 
 ## Container Configuration
@@ -84,7 +84,7 @@ _This section is updated by Claude during each session_
 - **Container**: pgadmin
 - **Image**: dpage/pgadmin4
 - **Port**: 8901 (web interface)
-- **Networks**: postgres-net, traefik-proxy
+- **Networks**: postgres-net, traefik-net
 - **External Access**: https://pgadmin.ai-servicers.com (with Keycloak SSO)
 - **Local Access**: http://linuxserver.lan:8901
 - **Authentication**: OAuth2/Keycloak with auto-provisioning
@@ -93,11 +93,11 @@ _This section is updated by Claude during each session_
 - **Deploy Scripts**: 
   - `/home/administrator/projects/postgres/deploy.sh` (PostgreSQL database server)
   - `/home/administrator/projects/postgres/deploy-pgadmin-sso.sh` (pgAdmin with Keycloak SSO)
-- **Secrets**: `/home/administrator/projects/secrets/postgres.env`
+- **Secrets**: `$HOME/projects/secrets/postgres.env`
 - **pgAdmin Config**: 
   - `/home/administrator/projects/postgres/pgadmin-oauth2-config.py` (OAuth2 and auto-provisioning)
-  - `/home/administrator/projects/secrets/postgresservers.json` (Server connections)
-  - `/home/administrator/projects/secrets/.pgpass` (Database passwords)
+  - `$HOME/projects/secrets/postgresservers.json` (Server connections)
+  - `$HOME/projects/secrets/.pgpass` (Database passwords)
 - **Backup Scripts**:
   - `backupdb.sh` - Full database backup
   - `backupdbsql.sh` - SQL format backup
@@ -274,7 +274,7 @@ docker run -d \
 # Or if container needs multiple networks:
 docker run -d \
   --name myapp \
-  --network traefik-proxy \
+  --network traefik-net \
   myapp:latest
 
 # Then connect to postgres-net:
@@ -302,7 +302,7 @@ postgresql://myapp_user:password@localhost:5432/myapp_db
 ```
 
 #### Step 4: Environment File Setup
-Create `/home/administrator/secrets/myapp.env`:
+Create `$HOME/projects/secrets/myapp.env`:
 ```bash
 # Database Configuration
 DB_HOST=postgres
@@ -456,7 +456,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 EOF
 
 # Create environment file
-cat > /home/administrator/secrets/${APP_NAME}.env << EOF
+cat > $HOME/projects/secrets/${APP_NAME}.env << EOF
 DB_HOST=postgres
 DB_PORT=5432
 DB_NAME=${DB_NAME}
@@ -465,10 +465,10 @@ DB_PASSWORD=${DB_PASSWORD}
 DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
 EOF
 
-chmod 600 /home/administrator/secrets/${APP_NAME}.env
+chmod 600 $HOME/projects/secrets/${APP_NAME}.env
 
 echo "Database ${DB_NAME} created for ${APP_NAME}"
-echo "Credentials saved to /home/administrator/secrets/${APP_NAME}.env"
+echo "Credentials saved to $HOME/projects/secrets/${APP_NAME}.env"
 ```
 
 ## Future Development Plans

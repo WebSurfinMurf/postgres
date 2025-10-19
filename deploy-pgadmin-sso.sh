@@ -3,7 +3,7 @@ set -e
 
 echo "Loading environment variables..."
 set -a
-source /home/administrator/projects/secrets/postgres.env
+source $HOME/projects/secrets/postgres.env
 set +a
 
 echo "Removing existing containers if they exist..."
@@ -20,8 +20,8 @@ docker run -d \
   -e PGADMIN_OAUTH2_CLIENT_ID="$PGADMIN_OAUTH2_CLIENT_ID" \
   -e PGADMIN_OAUTH2_CLIENT_SECRET="$PGADMIN_OAUTH2_CLIENT_SECRET" \
   -e PGPASSFILE=/home/pgadmin/.pgpass \
-  -v /home/administrator/projects/secrets/postgresservers.json:/pgadmin4/servers.json \
-  -v /home/administrator/projects/secrets/.pgpass:/home/pgadmin/.pgpass \
+  -v $HOME/projects/secrets/postgresservers.json:/pgadmin4/servers.json \
+  -v $HOME/projects/secrets/.pgpass:/home/pgadmin/.pgpass \
   -v /home/administrator/projects/postgres/pgadmin-oauth2-config.py:/pgadmin4/config_local.py:ro \
   -p 8901:80 \
   --label "traefik.enable=true" \

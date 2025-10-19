@@ -3,7 +3,7 @@ set -e
 
 echo "Loading environment variables..."
 set -a
-source /home/administrator/projects/secrets/postgres.env
+source $HOME/projects/secrets/postgres.env
 set +a
 
 echo "Removing existing containers if they exist..."
@@ -17,8 +17,8 @@ docker run -d \
   -e PGADMIN_DEFAULT_EMAIL="$PGADMIN_EMAIL" \
   -e PGADMIN_DEFAULT_PASSWORD="$PGADMIN_PASSWORD" \
   -e PGPASSFILE=/home/pgadmin/.pgpass \
-  -v /home/administrator/projects/secrets/postgresservers.json:/pgadmin4/servers.json \
-  -v /home/administrator/projects/secrets/.pgpass:/home/pgadmin/.pgpass \
+  -v $HOME/projects/secrets/postgresservers.json:/pgadmin4/servers.json \
+  -v $HOME/projects/secrets/.pgpass:/home/pgadmin/.pgpass \
   dpage/pgadmin4
 
 # Connect pgAdmin to traefik-proxy network for OAuth2 proxy access

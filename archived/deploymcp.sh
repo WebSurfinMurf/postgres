@@ -3,8 +3,8 @@ set -e
 
 echo "📦 Loading environment variables..."
 set -a
-source /home/administrator/projects/secrets/postgres.env
-source /home/administrator/projects/secrets/postgres-mcp.env
+source $HOME/projects/secrets/postgres.env
+source $HOME/projects/secrets/postgres-mcp.env
 set +a
 
 echo "🔁 Stopping and removing any existing MCP server container..."

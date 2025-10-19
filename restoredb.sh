@@ -3,7 +3,7 @@ set -e
 
 echo "🔐 Loading environment variables..."
 set -a
-source /home/administrator/projects/secrets/postgres.env
+source $HOME/projects/secrets/postgres.env
 set +a
 
 # Required: database name (used for naming, not SQL-specific)

@@ -31,8 +31,8 @@ services:
       PGPASSFILE: /home/pgadmin/.pgpass
     volumes:
       - pgadmin-data:/var/lib/pgadmin
-      - /home/administrator/secrets/postgresservers.json:/pgadmin4/servers.json:ro
-      - /home/administrator/secrets/.pgpass:/home/pgadmin/.pgpass:ro
+      - $HOME/projects/secrets/postgresservers.json:/pgadmin4/servers.json:ro
+      - $HOME/projects/secrets/.pgpass:/home/pgadmin/.pgpass:ro
       - /home/administrator/projects/postgres/pgadmin-oauth2-config.py:/pgadmin4/config_local.py:ro
     labels:
       - "traefik.enable=true"
