@@ -52,12 +52,17 @@ if ! docker network inspect postgres-net &>/dev/null; then
 fi
 echo -e "${GREEN}✅ postgres-net network exists${NC}"
 
-# Check/create volume
-if ! docker volume inspect postgres_data &>/dev/null; then
-    echo "Creating postgres_data volume..."
-    docker volume create postgres_data
+# Check/create data directory
+DATA_DIR="/home/administrator/projects/data/postgres"
+if [ ! -d "$DATA_DIR" ]; then
+    echo "Creating PostgreSQL data directory..."
+    mkdir -p "$DATA_DIR"
 fi
-echo -e "${GREEN}✅ PostgreSQL data volume ready${NC}"
+
+# Ensure correct ownership (PostgreSQL runs as UID 999 inside container)
+echo "Setting correct ownership on data directory..."
+docker run --rm -v "$DATA_DIR:/target" alpine chown -R 999:999 /target
+echo -e "${GREEN}✅ PostgreSQL data directory ready${NC}"
 
 # Validate docker-compose.yml syntax
 echo ""
@@ -102,7 +107,7 @@ echo ""
 echo "Database Configuration:"
 echo "  - Admin User: ${POSTGRES_USER}"
 echo "  - Default Database: ${POSTGRES_DB:-defaultdb}"
-echo "  - Data Volume: postgres_data"
+echo "  - Data Directory: /home/administrator/projects/data/postgres"
 echo ""
 echo "Connection Strings:"
 echo "  - Internal: postgresql://${POSTGRES_USER}:***@postgres:5432/${POSTGRES_DB:-defaultdb}"
