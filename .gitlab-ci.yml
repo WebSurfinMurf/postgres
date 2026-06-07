@@ -19,6 +19,10 @@ stages:
 
 variables:
   ADMIN_HOME: /home/administrator
+  # Pin the compose project so deploy is independent of the CI checkout path
+  # (the runner's build dir name would otherwise become the project name and
+  # collide with the live `postgres` container created from projects/postgres).
+  COMPOSE_PROJECT_NAME: postgres
 
 # Lint config files for syntax errors.
 validate:
