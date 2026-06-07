@@ -1,10 +1,20 @@
 # GitLab CI for postgres (core datastore).
 #
-# Source of truth is GitLab. This is a DATASTORE project — CI validates
-# config files only. NO deploy stage, NO destructive DB operations.
+# Source of truth is GitLab. Pushes to main trigger validate + deploy + test + mirror.
+#
+# SAFETY: deploy.sh is `docker compose up -d --remove-orphans` — declarative and
+# idempotent. An unchanged push is a no-op; the live DB container is only
+# recreated when its image/config actually changes (i.e. when you intend it).
+# There are NO destructive DB operations here (no down -v, no volume rm, no drops).
+#
+# Runtime: the linuxserver-administrator runner (gitlab-runner-admin) is root with
+# the host docker socket and /home/administrator bind-mounted, so deploy drives the
+# host docker daemon directly.
 
 stages:
   - validate
+  - deploy
+  - test
   - mirror
 
 variables:
@@ -33,11 +43,38 @@ validate:
     - bash -n manualsavealldb.sh
     - echo "All validations passed."
 
+# Declarative, idempotent deploy (docker compose up -d --remove-orphans).
+deploy:
+  stage: deploy
+  tags: [shell, linuxserver, administrator]
+  needs: [validate]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "api"'
+  script:
+    - export HOME="$ADMIN_HOME"
+    - ./deploy.sh
+  environment:
+    name: production
+
+# Post-deploy health check: server accepting connections.
+test:
+  stage: test
+  tags: [shell, linuxserver, administrator]
+  needs: [deploy]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "api"'
+  script:
+    - sleep 5  # let the container settle
+    - docker exec postgres pg_isready
+
 # Push mirror: GitLab -> GitHub (backup).
 mirror:
   stage: mirror
   tags: [shell, linuxserver, administrator]
-  needs: [validate]
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
     - if: '$CI_PIPELINE_SOURCE == "web"'
