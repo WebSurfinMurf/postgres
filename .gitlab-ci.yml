@@ -1,0 +1,47 @@
+# GitLab CI for postgres (core datastore).
+#
+# Source of truth is GitLab. This is a DATASTORE project — CI validates
+# config files only. NO deploy stage, NO destructive DB operations.
+
+stages:
+  - validate
+  - mirror
+
+variables:
+  ADMIN_HOME: /home/administrator
+
+# Lint config files for syntax errors.
+validate:
+  stage: validate
+  tags: [shell, linuxserver, administrator]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "api"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  script:
+    - echo "Validating docker-compose.yml syntax..."
+    - python3 -c "import yaml; yaml.safe_load(open('docker-compose.yml'))" && echo "  docker-compose.yml OK"
+    - echo "Validating docker-compose.pgadmin.yml syntax..."
+    - python3 -c "import yaml; yaml.safe_load(open('docker-compose.pgadmin.yml'))" && echo "  docker-compose.pgadmin.yml OK"
+    - echo "Validating deploy scripts syntax..."
+    - bash -n deploy.sh
+    - bash -n deploy-pgadmin-sso.sh
+    - bash -n backupdb.sh
+    - bash -n backupdbsql.sh
+    - bash -n restoredb.sh
+    - bash -n manualsavealldb.sh
+    - echo "All validations passed."
+
+# Push mirror: GitLab -> GitHub (backup).
+mirror:
+  stage: mirror
+  tags: [shell, linuxserver, administrator]
+  needs: [validate]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "api"'
+  script:
+    - ./scripts/mirror-to-github.sh
+  allow_failure: true
