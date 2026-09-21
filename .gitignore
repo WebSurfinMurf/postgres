@@ -64,3 +64,5 @@ data/
 __pycache__/
 *.pyc
 .cache/
+# Serena (MCP code tools) per-project state — local, not project knowledge (docs/context/ is)
+.serena/
