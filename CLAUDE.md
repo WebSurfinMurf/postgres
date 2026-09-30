@@ -61,6 +61,10 @@ _This section is updated by Claude during each session_
 ### Session: 2025-08-17
 - Initial CLAUDE.md created
 
+### Session: 2026-09-30
+- Provisioned `dotapicker_model` DB + owner role (LOGIN, no super, conn limit 12) for the dotapicker developer; dedicated network `dotapicker-model-db-net` (postgres attached in docker-compose.yml). Credential: `secrets/dotapicker-model-db.env` (copied to developer via `install-dotapicker-model-secret.sh`).
+- Added `scripts/dump-logical.sh` (nightly 03:30 cron, pg_dump -Fc, 14d local, then restic 04:00). Postgres is 15.13, SSL off, max_connections 100.
+
 ## Network Architecture
 - **Primary Network**: `postgres-net` (172.27.0.0/16)
 - **Secondary Network**: `guacamole-net` (for Guacamole database access)
